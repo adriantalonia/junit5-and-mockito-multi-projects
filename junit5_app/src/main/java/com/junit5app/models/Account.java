@@ -1,6 +1,6 @@
 package com.junit5app.models;
 
-import com.junit5app.models.exceptions.InsufficientMoneyException;
+import com.junit5app.exceptions.InsufficientMoneyException;
 
 import java.math.BigDecimal;
 
@@ -8,6 +8,8 @@ public class Account {
 
     private String user;
     private BigDecimal money;
+    private Bank bank;
+
 
     public Account(String user, BigDecimal money) {
         this.user = user;
@@ -28,6 +30,14 @@ public class Account {
 
     public void setMoney(BigDecimal money) {
         this.money = money;
+    }
+
+    public Bank getBank() {
+        return bank;
+    }
+
+    public void setBank(Bank bank) {
+        this.bank = bank;
     }
 
     public void debit(BigDecimal amount) {

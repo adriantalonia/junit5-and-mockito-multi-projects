@@ -1,6 +1,6 @@
 package com.junit5app.models;
 
-import com.junit5app.models.exceptions.InsufficientMoneyException;
+import com.junit5app.exceptions.InsufficientMoneyException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -59,6 +59,34 @@ class AccountTest {
         });
         String actual = exception.getMessage();
         String expected = "Insufficient Money";
+        assertEquals(expected, actual);
+    }
 
+    @Test
+    void testTransferMoney() {
+        Account account = new Account("Jon", new BigDecimal("2500"));
+        Account account2 = new Account("Adrian", new BigDecimal("1500.8989"));
+        Bank bank = new Bank();
+        bank.transfer(account2, account, new BigDecimal(500));
+        assertEquals("1000.8989", account2.getMoney().toPlainString());
+        assertEquals("3000", account.getMoney().toPlainString());
+    }
+
+    @Test
+    void testRelationBankAccounts() {
+        Account account = new Account("Jon", new BigDecimal("2500"));
+        Account account2 = new Account("Adrian", new BigDecimal("1500.8989"));
+
+        Bank bank = new Bank();
+        bank.setName("BBVA");
+        bank.addAccount(account);
+        bank.addAccount(account2);
+
+        assertEquals(2, bank.getAccounts().size());
+        assertEquals("BBVA", account.getBank().getName());
+
+        assertEquals("Adrian", bank.getAccounts().stream().filter(c -> c.getUser().equals("Adrian")).findFirst().get().getUser());
+        assertTrue(bank.getAccounts().stream().filter(c -> c.getUser().equals("Adrian")).findFirst().isPresent());
+        assertTrue(bank.getAccounts().stream().anyMatch(c -> c.getUser().equals("Adrian")));
     }
 }

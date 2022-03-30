@@ -1,4 +1,4 @@
-package com.junit5app.models.exceptions;
+package com.junit5app.exceptions;
 
 public class InsufficientMoneyException extends RuntimeException {
 
