@@ -1,5 +1,7 @@
 package com.junit5app.models;
 
+import com.junit5app.models.exceptions.InsufficientMoneyException;
+
 import java.math.BigDecimal;
 
 public class Account {
@@ -26,6 +28,18 @@ public class Account {
 
     public void setMoney(BigDecimal money) {
         this.money = money;
+    }
+
+    public void debit(BigDecimal amount) {
+        BigDecimal newMoney = this.money.subtract(amount);
+        if (newMoney.compareTo(BigDecimal.ZERO) < 0) {
+            throw new InsufficientMoneyException("Insufficient Money");
+        }
+        this.money = newMoney;
+    }
+
+    public void credit(BigDecimal amount) {
+        this.money = this.money.add(amount);
     }
 
     @Override
