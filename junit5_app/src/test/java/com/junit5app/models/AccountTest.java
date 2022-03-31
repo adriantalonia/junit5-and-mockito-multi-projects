@@ -82,11 +82,21 @@ class AccountTest {
         bank.addAccount(account);
         bank.addAccount(account2);
 
-        assertEquals(2, bank.getAccounts().size());
-        assertEquals("BBVA", account.getBank().getName());
+        assertAll(
+                () -> assertEquals(2, bank.getAccounts().size()),
+                () -> assertEquals("BBVA", account.getBank().getName()),
+                () -> assertEquals("Adrian", bank.getAccounts().stream().filter(c -> c.getUser().equals("Adrian")).findFirst().get().getUser()),
+                () -> {
+                    assertTrue(bank.getAccounts().stream().filter(c -> c.getUser().equals("Adrian")).findFirst().isPresent());
+                },
+                () -> {
+                    assertTrue(bank.getAccounts().stream().anyMatch(c -> c.getUser().equals("Adrian")));
+                });
 
+        /*assertEquals(2, bank.getAccounts().size());
+        assertEquals("BBVA", account.getBank().getName());
         assertEquals("Adrian", bank.getAccounts().stream().filter(c -> c.getUser().equals("Adrian")).findFirst().get().getUser());
         assertTrue(bank.getAccounts().stream().filter(c -> c.getUser().equals("Adrian")).findFirst().isPresent());
-        assertTrue(bank.getAccounts().stream().anyMatch(c -> c.getUser().equals("Adrian")));
+        assertTrue(bank.getAccounts().stream().anyMatch(c -> c.getUser().equals("Adrian")));*/
     }
 }
