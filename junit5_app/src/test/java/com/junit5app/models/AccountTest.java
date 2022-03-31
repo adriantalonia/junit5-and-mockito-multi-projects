@@ -83,8 +83,8 @@ class AccountTest {
         bank.addAccount(account2);
 
         assertAll(
-                () -> assertEquals(2, bank.getAccounts().size()),
-                () -> assertEquals("BBVA", account.getBank().getName()),
+                () -> assertEquals(2, bank.getAccounts().size(), "no equals banks"),
+                () -> assertEquals("BBVA", account.getBank().getName(), () -> "no equals banks"), //string will create when is not equal
                 () -> assertEquals("Adrian", bank.getAccounts().stream().filter(c -> c.getUser().equals("Adrian")).findFirst().get().getUser()),
                 () -> {
                     assertTrue(bank.getAccounts().stream().filter(c -> c.getUser().equals("Adrian")).findFirst().isPresent());
