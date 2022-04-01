@@ -9,8 +9,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
 
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS) //with this you can remove statuc
+//@TestInstance(TestInstance.Lifecycle.PER_CLASS) //with this you can remove static
 class AccountTest {
 
     Account account;
@@ -189,5 +190,28 @@ class AccountTest {
     @DisabledIfEnvironmentVariable(named = "ENVIRONMENT", matches = "prod")
     void testEnvProdDisabled() {
     }
+
+
+    @Test
+    void testMoneyAssumptionDev() {
+        //Account account = new Account("Adrian", new BigDecimal("1000.12345"));
+        boolean isDev = "dev".equals(System.getProperty("ENV"));
+        assumeTrue(isDev); // dont execute asserts
+        assertEquals(1000.12345, account.getMoney().doubleValue());
+        assertFalse(account.getMoney().compareTo(BigDecimal.ZERO) < 0);
+    }
+
+    @Test
+    void testMoneyAssumptionDev2() {
+        //Account account = new Account("Adrian", new BigDecimal("1000.12345"));
+        boolean isDev = "dev".equals(System.getProperty("ENV"));
+        assumingThat(isDev, () -> { //only execute asserts
+            assertEquals(1000.12345, account.getMoney().doubleValue());
+            assertFalse(account.getMoney().compareTo(BigDecimal.ZERO) < 0);
+        });
+        assertEquals(1000.12345, account.getMoney().doubleValue());
+        assertFalse(account.getMoney().compareTo(BigDecimal.ZERO) < 0);
+    }
+
 
 }
