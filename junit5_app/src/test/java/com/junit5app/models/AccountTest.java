@@ -58,8 +58,14 @@ class AccountTest {
         assertFalse(account.getMoney().compareTo(BigDecimal.ZERO) < 0);
     }
 
-    @Test
-    void testReferAccount() {
+    @DisplayName("Repeat Test")
+    @RepeatedTest(value = 5, name = "{displayName} Iteration {currentRepetition} of {totalRepetitions}")
+    void testReferAccount(RepetitionInfo info) {
+
+        if (info.getCurrentRepetition() == 3) {
+            System.out.println("Here is " + info.getCurrentRepetition());
+        }
+
         Account account = new Account("Adrian", new BigDecimal("1000.4789"));
         Account account2 = new Account("Adrian", new BigDecimal("1000.4789"));
         //assertNotEquals(account2, account); //compare reference
@@ -203,8 +209,6 @@ class AccountTest {
         void testEnvProdDisabled() {
         }
     }
-
-
 
 
     @Test
