@@ -133,63 +133,78 @@ class AccountTest {
         assertTrue(bank.getAccounts().stream().anyMatch(c -> c.getUser().equals("Adrian")));*/
     }
 
-    @Test
-    @EnabledOnOs(OS.WINDOWS)
-        // execute only windows
-    void testOnlyWindows() {
+    @Nested
+    @DisplayName("Testing Operative System")
+    class OperativeSystemTest {
+        @Test
+        @EnabledOnOs(OS.WINDOWS)
+            // execute only windows
+        void testOnlyWindows() {
+        }
+
+        @Test
+        @EnabledOnOs(OS.LINUX)
+        void testOnlyLinux() {
+        }
     }
 
-    @Test
-    @EnabledOnOs(OS.LINUX)
-    void testOnlyLinux() {
+    @Nested
+    @DisplayName("Testing Java Version")
+    class JavaVersionTest {
+        @Test
+        @EnabledOnJre(JRE.JAVA_8)
+        void testOnlyJava8() {
+        }
+
+        @Test
+        void testSystemProperties() {
+            Properties p = System.getProperties();
+            p.forEach((k, v) -> System.out.println(k + ":" + v));
+        }
+
+        @Test
+        @EnabledIfSystemProperty(named = "java.version", matches = "11.0.14.1")
+        void testSystemProperty() {
+
+        }
     }
 
-    @Test
-    @EnabledOnJre(JRE.JAVA_8)
-    void testOnlyJava8() {
+    @Nested
+    @DisplayName("Testing System Properties")
+    class SystemPropertiesTest {
+        @Test
+        @DisabledIfSystemProperty(named = "os.arch", matches = ".*32.*")
+        void testOnly64() {
+        }
+
+        @Test
+        @EnabledIfSystemProperty(named = "USERNAME", matches = "adrian")
+        void testUserName() {
+        }
+
+        @Test
+        void getEnv() {
+            Map<String, String> getenv = System.getenv();
+            getenv.forEach((k, v) -> System.out.println(k + " = " + v));
+        }
+
+        @Test
+        @EnabledIfEnvironmentVariable(named = "JAVA_HOME", matches = ".*java-11.*")
+        void testJavaHome() {
+        }
+
+        @Test
+        @EnabledIfEnvironmentVariable(named = "ENVIRONMENT", matches = "dev")
+        void testEnv() {
+        }
+
+        @Test
+        @DisabledIfEnvironmentVariable(named = "ENVIRONMENT", matches = "prod")
+        void testEnvProdDisabled() {
+        }
     }
 
-    @Test
-    void testSystemProperties() {
-        Properties p = System.getProperties();
-        p.forEach((k, v) -> System.out.println(k + ":" + v));
-    }
 
-    @Test
-    @EnabledIfSystemProperty(named = "java.version", matches = "11.0.14.1")
-    void testSystemProperty() {
-    }
-
-    @Test
-    @DisabledIfSystemProperty(named = "os.arch", matches = ".*32.*")
-    void testOnly64() {
-    }
-
-    @Test
-    @EnabledIfSystemProperty(named = "USERNAME", matches = "adrian")
-    void testUserName() {
-    }
-
-    @Test
-    void getEnv() {
-        Map<String, String> getenv = System.getenv();
-        getenv.forEach((k, v) -> System.out.println(k + " = " + v));
-    }
-
-    @Test
-    @EnabledIfEnvironmentVariable(named = "JAVA_HOME", matches = ".*java-11.*")
-    void testJavaHome() {
-    }
-
-    @Test
-    @EnabledIfEnvironmentVariable(named = "ENVIRONMENT", matches = "dev")
-    void testEnv() {
-    }
-
-    @Test
-    @DisabledIfEnvironmentVariable(named = "ENVIRONMENT", matches = "prod")
-    void testEnvProdDisabled() {
-    }
 
 
     @Test
