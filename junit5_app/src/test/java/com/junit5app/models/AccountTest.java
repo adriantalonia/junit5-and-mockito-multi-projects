@@ -3,8 +3,15 @@ package com.junit5app.models;
 import com.junit5app.exceptions.InsufficientMoneyException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -39,8 +46,7 @@ class AccountTest {
 
 
     @Test
-    @DisplayName("test user name")
-        //name a method
+    @DisplayName("test user name") //name a method
     void testUser() {
         //Account account = new Account("Adrian", new BigDecimal("1000.12345"));
         String expected = "Adrian";
@@ -50,8 +56,7 @@ class AccountTest {
     }
 
     @Test
-    @Disabled
-        //disabled method but that show in the report
+    @Disabled//disabled method but that show in the report
     void testMoney() {
         //Account account = new Account("Adrian", new BigDecimal("1000.12345"));
         assertEquals(1000.12345, account.getMoney().doubleValue());
@@ -71,6 +76,65 @@ class AccountTest {
         //assertNotEquals(account2, account); //compare reference
         assertEquals(account2, account); // two object different location in memory
     }
+
+    @Nested
+    class ParameterizedTests {
+
+        @ParameterizedTest(name = "number {index} executing with value {0} - {argumentsWithNames}")
+        @ValueSource(strings = {"100", "200", "300", "400", "500", "700", "1000.12345"})
+            //@ValueSource(doubles = {100, 200, 300, 400, 500, 700, 1000})
+        void testAccountDebitParameterized(String amount) {
+            Account account = new Account("Adrian", new BigDecimal("1000.12345"));
+            account.debit(new BigDecimal(amount));
+            assertNotNull(account.getMoney());
+            assertTrue(account.getMoney().compareTo(BigDecimal.ZERO) > 0);
+        }
+
+        @ParameterizedTest(name = "number {index} executing with value {0} - {argumentsWithNames}")
+        @CsvSource({"1,100", "2,200", "3,300", "4,500", "5,700", "6,1000.12345"})
+        void testAccountDebitParameterized2(String index, String amount) {
+            Account account = new Account("Adrian", new BigDecimal("1000.12345"));
+            System.out.println(index + " -> " + amount);
+            account.debit(new BigDecimal(amount));
+            assertNotNull(account.getMoney());
+            assertTrue(account.getMoney().compareTo(BigDecimal.ZERO) > 0);
+        }
+
+        @ParameterizedTest(name = "number {index} executing with value {0} - {argumentsWithNames}")
+        @CsvFileSource(resources = "/data.csv")
+        void testAccountDebitParameterized3(String amount) {
+            Account account = new Account("Adrian", new BigDecimal("1000.12345"));
+            account.debit(new BigDecimal(amount));
+            assertNotNull(account.getMoney());
+            assertTrue(account.getMoney().compareTo(BigDecimal.ZERO) > 0);
+        }
+
+
+
+        @ParameterizedTest(name = "number {index} executing with value {0} - {argumentsWithNames}")
+        @CsvSource({"200,100", "250,200", "300,300", "510,500", "750,700", "1000.12345,1000.12345"})
+        void testAccountDebitParameterized5(String money, String amount) {
+            System.out.println(money + " -> " + amount);
+            account.setMoney(new BigDecimal(money));
+            account.debit(new BigDecimal(amount));
+            assertNotNull(account.getMoney());
+            assertTrue(account.getMoney().compareTo(BigDecimal.ZERO) > 0);
+        }
+    }
+
+    @ParameterizedTest(name = "number {index} executing with value {0} - {argumentsWithNames}")
+    @MethodSource("listAmount")
+    void testAccountDebitParameterized4(String amount) {
+        Account account = new Account("Adrian", new BigDecimal("1000.12345"));
+        account.debit(new BigDecimal(amount));
+        assertNotNull(account.getMoney());
+        assertTrue(account.getMoney().compareTo(BigDecimal.ZERO) > 0);
+    }
+
+    public static List<String> listAmount() {
+        return Arrays.asList("100", "200", "300", "400", "500", "700", "1000.12345");
+    }
+
 
     @Test
     void testAccountDebit() {
