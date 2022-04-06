@@ -10,10 +10,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
@@ -22,9 +24,18 @@ import static org.junit.jupiter.api.Assumptions.*;
 class AccountTest {
 
     Account account;
+    TestInfo testInfo;
+    TestReporter testReporter;
 
     @BeforeEach
-    void initMethod() {
+    void initMethod(TestInfo testInfo, TestReporter testReporter) {
+
+        testReporter.publishEntry("executing: "+testInfo.getDisplayName() + " "+ testInfo.getTestMethod().orElse(null).getName() + " " +
+                " with the tags "+ testInfo.getTags());
+
+        this.testInfo = testInfo;
+        this.testReporter = testReporter;
+
         this.account = new Account("Adrian", new BigDecimal("1000.12345"));
         System.out.println("Init method");
     }
@@ -49,6 +60,7 @@ class AccountTest {
     @DisplayName("test user name") //name a method
     void testUser() {
         //Account account = new Account("Adrian", new BigDecimal("1000.12345"));
+
         String expected = "Adrian";
         String real = account.getUser();
         assertEquals(expected, real);
@@ -218,6 +230,7 @@ class AccountTest {
         }
     }
 
+    @Tag("param") // just execute a tap
     @Nested
     @DisplayName("Testing Java Version")
     class JavaVersionTest {
@@ -235,7 +248,9 @@ class AccountTest {
         @Test
         @EnabledIfSystemProperty(named = "java.version", matches = "11.0.14.1")
         void testSystemProperty() {
-
+            if(testInfo.getTags().contains("param")) {
+                System.out.println("do something with the tag ");
+            }
         }
     }
 
@@ -296,5 +311,27 @@ class AccountTest {
         assertFalse(account.getMoney().compareTo(BigDecimal.ZERO) < 0);
     }
 
+    @Nested
+    @Tag("timeout")
+    class TimeOutTests {
+        @Test
+        @Timeout(5)
+        void testTimeOut() throws InterruptedException{
+            TimeUnit.SECONDS.sleep(6);
+        }
+
+        @Test
+        @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
+        void testTimeOut2() throws InterruptedException{
+            TimeUnit.SECONDS.sleep(6);
+        }
+
+        @Test
+        void assertTimeOut() {
+            assertTimeout(Duration.ofSeconds(5), () -> {
+                TimeUnit.SECONDS.sleep(6);
+            });
+        }
+    }
 
 }
