@@ -2,20 +2,24 @@ package com.mockitoapp.services;
 
 import com.mockitoapp.models.Exam;
 import com.mockitoapp.repositories.ExamRepository;
+import com.mockitoapp.repositories.QuestionRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ExamServiceImpl implements ExamService {
 
-    private ExamRepository repository;
+    private ExamRepository examRepository;
+    private QuestionRepository questionRepository;
 
-    public ExamServiceImpl(ExamRepository repository) {
-        this.repository = repository;
+    public ExamServiceImpl(ExamRepository examRepository, QuestionRepository questionRepository) {
+        this.examRepository = examRepository;
+        this.questionRepository = questionRepository;
     }
 
     @Override
     public Exam findExamByName(String name) {
-        Optional<Exam> exam = repository.findALl().stream().filter(e -> e.getName().contains(name)).findFirst();
+        Optional<Exam> exam = examRepository.findALl().stream().filter(e -> e.getName().contains(name)).findFirst();
         if(exam.isPresent()) {
             return exam.orElseThrow();
         }
@@ -24,6 +28,13 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public Optional<Exam> findExamByNameOptional(String name) {
-        return repository.findALl().stream().filter(e -> e.getName().contains(name)).findFirst();
+        return examRepository.findALl().stream().filter(e -> e.getName().contains(name)).findFirst();
+    }
+
+    @Override
+    public Exam findExamByQuestion(String name) {
+        Exam exam = findExamByNameOptional(name).orElseThrow();
+        exam.setQuestions(questionRepository.findQuestionsByExam(exam.getId()));
+        return exam;
     }
 }
