@@ -4,7 +4,6 @@ import com.mockitoapp.models.Exam;
 import com.mockitoapp.repositories.ExamRepository;
 import com.mockitoapp.repositories.QuestionRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 public class ExamServiceImpl implements ExamService {
@@ -20,7 +19,7 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public Exam findExamByName(String name) {
         Optional<Exam> exam = examRepository.findALl().stream().filter(e -> e.getName().contains(name)).findFirst();
-        if(exam.isPresent()) {
+        if (exam.isPresent()) {
             return exam.orElseThrow();
         }
         return null;
@@ -36,5 +35,13 @@ public class ExamServiceImpl implements ExamService {
         Exam exam = findExamByNameOptional(name).orElseThrow();
         exam.setQuestions(questionRepository.findQuestionsByExam(exam.getId()));
         return exam;
+    }
+
+    @Override
+    public Exam save(Exam exam) {
+        if (!exam.getQuestions().isEmpty()) {
+            questionRepository.saveQuestions(exam.getQuestions());
+        }
+        return examRepository.save(exam);
     }
 }
