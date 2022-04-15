@@ -319,4 +319,78 @@ class ExamServiceImplTest {
         assertEquals("Math", exam.getName());
     }
 
+    // spy
+    @Test
+    void testSpy() {
+        ExamRepository examRepo = spy(ExamRepositoryImpl.class); //use implementation not interface
+        QuestionRepository questionRepo = spy(QuestionRepositoryImpl.class);
+        ExamService examServ = new ExamServiceImpl(examRepo, questionRepo);
+
+        List<String> questions = Arrays.asList("Geometry");
+        //when(questionRepo.findQuestionsByExamId(anyLong())).thenReturn(questions);
+        //when(questionRepo.findQuestionsByExamId(anyLong())).thenReturn(Data.QUESTIONS);
+
+        doReturn(questions).when(questionRepo).findQuestionsByExamId(anyLong());
+
+        Exam exam =  examServ.findExamByQuestion("Math");
+
+        assertEquals(5, exam.getId());
+        assertEquals("Math", exam.getName());
+        assertEquals(1, exam.getQuestions().size());
+        //assertEquals(4, exam.getQuestions().size());
+        assertTrue(exam.getQuestions().contains("Geometry"));
+
+        verify(examRepo).findALl();
+        verify(questionRepo).findQuestionsByExamId(anyLong());
+    }
+
+    @Test
+    void testInvocationOrder(){
+        when(repo.findALl()).thenReturn(Data.EXAMS);
+
+        service.findExamByQuestion("Math");
+        service.findExamByQuestion("Languages");
+
+        InOrder inOrder = inOrder(questionRepository);
+        inOrder.verify(questionRepository).findQuestionsByExamId(5L);
+        inOrder.verify(questionRepository).findQuestionsByExamId(6l);
+    }
+
+    @Test
+    void testInvocationOrder2(){
+        when(repo.findALl()).thenReturn(Data.EXAMS);
+
+        service.findExamByQuestion("Math");
+        service.findExamByQuestion("Languages");
+
+        InOrder inOrder = inOrder(repo, questionRepository);
+        inOrder.verify(repo).findALl();
+        inOrder.verify(questionRepository).findQuestionsByExamId(5L);
+        inOrder.verify(repo).findALl();
+        inOrder.verify(questionRepository).findQuestionsByExamId(6l);
+    }
+
+    @Test
+    void testInvocationNumber() {
+        when(repo.findALl()).thenReturn(Data.EXAMS);
+        service.findExamByQuestion("Math");
+
+        verify(questionRepository).findQuestionsByExamId(5l);
+        // number of calls to the method
+        verify(questionRepository, times(1)).findQuestionsByExamId(5l);
+        verify(questionRepository, atLeast(1)).findQuestionsByExamId(5l);
+        verify(questionRepository, atLeastOnce()).findQuestionsByExamId(5l);
+        verify(questionRepository, atMost(1)).findQuestionsByExamId(5l);
+        verify(questionRepository, atMostOnce()).findQuestionsByExamId(5l);
+    }
+
+    @Test
+    void testInvocationNumber2() {
+        when(repo.findALl()).thenReturn(Collections.emptyList());
+        service.findExamByQuestion("Math");
+        verify(questionRepository, never()).findQuestionsByExamId(5L);
+        verifyNoInteractions(questionRepository);
+
+        verify(repo).findALl();
+    }
 }
