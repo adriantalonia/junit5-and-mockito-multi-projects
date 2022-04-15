@@ -33,7 +33,7 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public Exam findExamByQuestion(String name) {
         Exam exam = findExamByNameOptional(name).orElseThrow();
-        exam.setQuestions(questionRepository.findQuestionsByExam(exam.getId()));
+        exam.setQuestions(questionRepository.findQuestionsByExamId(exam.getId()));
         return exam;
     }
 

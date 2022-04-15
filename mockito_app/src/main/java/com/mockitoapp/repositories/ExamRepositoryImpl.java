@@ -1,5 +1,6 @@
 package com.mockitoapp.repositories;
 
+import com.mockitoapp.Data;
 import com.mockitoapp.models.Exam;
 
 import java.util.Arrays;
@@ -8,11 +9,13 @@ import java.util.List;
 public class ExamRepositoryImpl implements ExamRepository {
     @Override
     public List<Exam> findALl() {
-        return Arrays.asList(new Exam(5L, "Math"), new Exam(6l, "Languajes"), new Exam(7l, "History"));
+        System.out.println("ExamRepositoryImpl findALl");
+        return Data.EXAMS;
     }
 
     @Override
     public Exam save(Exam exam) {
-        return null;
+        System.out.println("ExamRepositoryImpl save");
+        return Data.EXAM;
     }
 }
