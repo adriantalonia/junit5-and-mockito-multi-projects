@@ -1,7 +1,13 @@
 package com.springboottestapp.springboot_test_app.models;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "banks")
 public class Bank {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private int transactions;
