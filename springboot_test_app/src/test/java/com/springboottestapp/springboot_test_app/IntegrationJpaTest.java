@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -43,5 +44,55 @@ public class IntegrationJpaTest {
         List<Account> accounts = accountRepository.findAll();
         assertFalse(accounts.isEmpty());
         assertEquals(2, accounts.size());
+    }
+
+    @Test
+    void testSave() {
+        //given
+        Account accountP = new Account(null, "Oscar", new BigDecimal("3000"));
+
+
+        //when
+        Account accountS = accountRepository.save(accountP);
+        //Account accountR = accountRepository.findByName("Oscar").orElseThrow();
+        //Account accountR = accountRepository.findById(accountS.getId()).orElseThrow();
+
+        //then
+        assertEquals("Oscar", accountS.getName());
+        assertEquals("3000", accountS.getMoney().toPlainString());
+    }
+
+    @Test
+    void testUpdate() {
+        //Given
+        Account accountP = new Account(null, "Erick", new BigDecimal("3000"));
+        //when
+        Account accountR = accountRepository.save(accountP);
+
+        //then
+        assertEquals("Erick", accountR.getName());
+        assertEquals("3000", accountR.getMoney().toPlainString());
+
+        //when
+        accountR.setMoney(new BigDecimal("3800"));
+        Account accountUpdated = accountRepository.save(accountR);
+
+        //then
+        assertEquals("Erick", accountUpdated.getName());
+        assertEquals("3800", accountUpdated.getMoney().toPlainString());
+    }
+
+    @Test
+    void testDelete() {
+        Account account = accountRepository.findById(2L).orElseThrow();
+        assertEquals("Eduardo", account.getName());
+
+        accountRepository.delete(account);
+
+        assertThrows(NoSuchElementException.class, ()-> {
+           accountRepository.findById(2L).orElseThrow();
+        });
+
+        assertEquals(1, accountRepository.findAll().size());
     }
 }
